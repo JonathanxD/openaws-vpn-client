@@ -1,0 +1,132 @@
+# To contribute improvements to CI/CD templates, please follow the Development guide at:
+# https://docs.gitlab.com/ee/development/cicd/templates.html
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Gradle.gitlab-ci.yml
+
+# This is the Gradle build system for JVM applications
+# https://gradle.org/
+# https://github.com/gradle/gradle
+
+image: rust:1.57.0
+
+stages:
+  - build
+  - deploy
+  - upload
+  - build-image
+  - manifest
+
+# Disable the Gradle daemon for Continuous Integration servers as correctness
+# is usually a priority over speed in CI environments. Using a fresh
+# runtime for each build is more reliable since the runtime is completely
+# isolated from any previous builds.
+variables:
+  CACHE_FALLBACK_KEY: "master"
+
+build:
+  stage: build
+  script:
+    - "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly"
+    - "cargo +nightly build --release"
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull-push
+    paths:
+      - target
+
+deploy:
+  stage: deploy
+  image: rust:1.57.0
+  before_script:
+    - 'curl -fsSL https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 --output jq-linux64'
+    - 'chmod +x ./jq-linux64'
+  script:
+    - >
+      if [[ ! $(curl -s https://crates.io/api/v1/crates/openaws-vpn-client/versions | ./jq-linux64 -r ".versions[] | select(.num == \"${CI_COMMIT_TAG}\")") ]]; then
+        rm -rf ./jq-linux64
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly
+        mkdir -p ~/.cargo
+        cargo +nightly publish --token $(echo $CRATES_TOKEN | base64 -d -w 0)
+      else
+        true
+      fi
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - target
+  only:
+    - tags
+
+upload:
+  stage: upload
+  script:
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file target/release/junitify "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/junitify/${CI_COMMIT_TAG}/junitify"'
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - target
+  only:
+    - tags
+
+build-image:
+  stage: build-image
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - 'echo -ne "$DOCKER_TOKEN" | base64 -d | docker login --username $DOCKER_USERNAME --password-stdin'
+  script:
+    - 'docker build -t jonathanxd/junitify:${CI_COMMIT_TAG} -t jonathanxd/junitify:latest .'
+    - 'docker push jonathanxd/junitify:${CI_COMMIT_TAG}'
+    - 'docker push jonathanxd/junitify:latest'
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - target
+  only:
+    - tags
+
+build-image-arm64:
+  allow_failure: true
+  stage: build-image
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - 'echo -ne "$DOCKER_TOKEN" | base64 -d | docker login --username $DOCKER_USERNAME --password-stdin'
+  script:
+    - 'docker build -t jonathanxd/junitify:${CI_COMMIT_TAG}-arm64 -t jonathanxd/junitify:latest-arm64 .'
+    - 'docker push jonathanxd/junitify:${CI_COMMIT_TAG}-arm64'
+    - 'docker push jonathanxd/junitify:latest-arm64'
+  only:
+    - tags
+  tags:
+    - arm64
+    - rpi4
+
+manifest-create:
+  stage: manifest
+  image: docker:latest
+  needs:
+    - build-image-arm64
+    - build-image
+  services:
+    - docker:dind
+  before_script:
+    - 'echo -ne "$DOCKER_TOKEN" | base64 -d | docker login --username $DOCKER_USERNAME --password-stdin'
+  script:
+    - 'docker pull jonathanxd/junitify:${CI_COMMIT_TAG}'
+    - 'docker pull jonathanxd/junitify:latest'
+    - 'docker tag jonathanxd/junitify:${CI_COMMIT_TAG} jonathanxd/junitify:${CI_COMMIT_TAG}-amd64'
+    - 'docker tag jonathanxd/junitify:latest jonathanxd/junitify:latest-amd64'
+    - 'docker push jonathanxd/junitify:${CI_COMMIT_TAG}-amd64'
+    - 'docker push jonathanxd/junitify:latest-amd64'
+    - 'docker manifest create jonathanxd/junitify:latest --amend jonathanxd/junitify:latest-amd64 --amend jonathanxd/junitify:latest-arm64'
+    - 'docker manifest create jonathanxd/junitify:${CI_COMMIT_TAG} --amend jonathanxd/junitify:${CI_COMMIT_TAG}-amd64 --amend jonathanxd/junitify:${CI_COMMIT_TAG}-arm64'
+    - 'docker manifest push docker.io/jonathanxd/junitify:latest'
+    - 'docker manifest push docker.io/jonathanxd/junitify:${CI_COMMIT_TAG}'
+  only:
+    - tags
