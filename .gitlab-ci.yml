@@ -35,6 +35,8 @@ build:
 build-openvpn:
   stage: build
   script:
+    - "apt update"
+    - "apt install -y lz4"
     - "cd scripts"
     - "bash patch-openvpn.sh"
     - "cd .."
