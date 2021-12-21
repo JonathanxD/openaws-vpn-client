@@ -1,6 +1,8 @@
+cargo-features = ["strip"]
+
 [package]
 name = "openaws-vpn-client"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["KoresFramework", "Jonathan H. R. Lopes <jhrldev@gmail.com>"]
 license = "MIT"
@@ -31,3 +33,6 @@ open = "=2.0.2"
 tokio-stream = "=0.1.8"
 temp-dir = "=0.1.11"
 ctrlc = "=3.2.1"
+
+[profile.release]
+strip = "symbols"

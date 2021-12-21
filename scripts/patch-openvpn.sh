@@ -10,6 +10,18 @@
 # - https://smallhacks.wordpress.com/
 # - https://github.com/samm-git/aws-vpn-client
 
+CURRENT_DIRNAME=${PWD##*/}
+
+if [ "$CURRENT_DIRNAME" != "scripts" ]; then
+    if ! [[ -d "scripts" ]]
+    then
+        echo "Could not find 'scripts' directory. Please run this script from the root directory of the repository."
+        exit 255
+    fi
+
+    cd "scripts"
+fi
+
 ROOT_DIR="$(pwd)"
 mkdir -p "$ROOT_DIR/../share/openvpn"
 
