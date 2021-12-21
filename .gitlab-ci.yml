@@ -39,6 +39,7 @@ build-openvpn:
     - "apt install -y lz4"
     - "apt install -y liblz4-dev"
     - "apt install -y liblzo2-dev"
+    - "apt install -y libpam-dev"
     - "cd scripts"
     - "bash patch-openvpn.sh"
     - "cd .."
