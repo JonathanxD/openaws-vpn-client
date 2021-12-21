@@ -67,10 +67,11 @@ deploy:
   image: rust:1.57.0
   before_script:
     - "apt update"
-    - "apt install -y lz4"
-    - "apt install -y liblz4-dev"
-    - "apt install -y liblzo2-dev"
-    - "apt install -y libpam-dev"
+    - "apt install -y libglib2.0-dev"
+    - "apt install -y libpango1.0-dev"
+    - "apt install -y libcairo2-dev"
+    - "apt install -y libatk1.0-dev"
+    - "apt install -y libgtk-3-dev"
     - 'rm -rf share.tar.gz'
     - 'curl -fsSL https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 --output jq-linux64'
     - 'chmod +x ./jq-linux64'
