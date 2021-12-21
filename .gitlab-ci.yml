@@ -37,6 +37,9 @@ build:
     policy: pull-push
     paths:
       - target
+  artifacts:
+    paths:
+      - target/release/openaws-vpn-client
 
 build-openvpn:
   stage: build
@@ -53,6 +56,9 @@ build-openvpn:
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull-push
+    paths:
+      - share.tar.gz
+  artifacts:
     paths:
       - share.tar.gz
 
@@ -82,6 +88,9 @@ deploy:
 
 upload:
   stage: upload
+  dependencies:
+    - build
+    - build-openvpn
   script:
     - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file target/release/openaws-vpn-client "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/openaws-vpn-client/${CI_COMMIT_TAG}/openaws-vpn-client"'
     - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file share.tar.gz "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/openaws-vpn-client/${CI_COMMIT_TAG}/share.tar.gz"'
