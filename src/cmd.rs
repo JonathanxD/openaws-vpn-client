@@ -1,5 +1,6 @@
 use crate::saml_server::Saml;
 use crate::{LocalConfig, Log};
+use lazy_static::lazy_static;
 use std::ffi::OsString;
 use std::fs::{remove_file, File};
 use std::io::Write;
@@ -8,6 +9,10 @@ use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex};
 use temp_dir::TempDir;
 use tokio::io::AsyncBufReadExt;
+
+lazy_static! {
+    static ref SHARED_DIR: String = std::env::var("SHARED_DIR").unwrap_or("./share".to_string());
+}
 
 pub struct ProcessInfo {
     pub pid: Mutex<Option<u32>>,
@@ -28,7 +33,7 @@ pub struct AwsSaml {
 }
 
 pub async fn run_ovpn(log: Arc<Log>, config: PathBuf, addr: String, port: u16) -> AwsSaml {
-    let out = tokio::process::Command::new("./openvpn")
+    let out = tokio::process::Command::new("./openvpn/bin/openvpn")
         .arg("--config")
         .arg(config)
         .arg("--verb")
@@ -39,9 +44,9 @@ pub async fn run_ovpn(log: Arc<Log>, config: PathBuf, addr: String, port: u16) -
         .arg(addr)
         .arg(format!("{}", port))
         .arg("--auth-user-pass")
-        .arg("../../pwd.txt")
+        .arg("./pwd.txt")
         .stdout(Stdio::piped())
-        .current_dir("share/openvpn/bin")
+        .current_dir(SHARED_DIR.as_str())
         .spawn()
         .unwrap();
 
@@ -114,7 +119,7 @@ pub async fn connect_ovpn(
     let b = std::fs::canonicalize(temp_pwd).unwrap().to_path_buf();
 
     let mut out = tokio::process::Command::new("pkexec")
-        .arg("./openvpn")
+        .arg("./openvpn/bin/openvpn")
         .arg("--config")
         .arg(config)
         .arg("--verb")
@@ -134,7 +139,7 @@ pub async fn connect_ovpn(
         .arg("--auth-user-pass")
         .arg(b)
         .stdout(Stdio::piped())
-        .current_dir("share/openvpn/bin")
+        .current_dir(SHARED_DIR.as_str())
         .kill_on_drop(true)
         .spawn()
         .unwrap();
