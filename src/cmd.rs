@@ -12,6 +12,7 @@ use tokio::io::AsyncBufReadExt;
 
 lazy_static! {
     static ref SHARED_DIR: String = std::env::var("SHARED_DIR").unwrap_or("./share".to_string());
+    static ref OPENVPN_FILE: String = std::env::var("OPENVPN_FILE").unwrap_or("./openvpn/bin/openvpn".to_string());
 }
 
 pub struct ProcessInfo {
@@ -33,7 +34,7 @@ pub struct AwsSaml {
 }
 
 pub async fn run_ovpn(log: Arc<Log>, config: PathBuf, addr: String, port: u16) -> AwsSaml {
-    let out = tokio::process::Command::new("./openvpn/bin/openvpn")
+    let out = tokio::process::Command::new(OPENVPN_FILE.as_str())
         .arg("--config")
         .arg(config)
         .arg("--verb")
@@ -119,7 +120,7 @@ pub async fn connect_ovpn(
     let b = std::fs::canonicalize(temp_pwd).unwrap().to_path_buf();
 
     let mut out = tokio::process::Command::new("pkexec")
-        .arg("./openvpn/bin/openvpn")
+        .arg(OPENVPN_FILE.as_str())
         .arg("--config")
         .arg(config)
         .arg("--verb")
