@@ -26,16 +26,12 @@ impl DnsResolver {
         }
     }
 
-    pub fn resolve_addresses(&self) {
-        let random_start = rng_domain();
-        let remote = { self.config.remote.lock().unwrap().deref().clone() }
-            .map(|d| format!("{}.{}", random_start, d.0));
-
+    fn resolve_to_ip_list(&self, remote: String) -> Vec<IpAddr> {
         self.log
-            .append(format!("Looking up into '{}'...", remote.clone().unwrap()).as_str());
+            .append(format!("Looking up into '{}'...", remote).as_str());
 
         let resolver = domain::resolv::StubResolver::new();
-        let d: domain::base::Dname<Vec<u8>> = Dname::from_str(remote.unwrap().as_str()).unwrap();
+        let d: domain::base::Dname<Vec<u8>> = Dname::from_str(&remote).unwrap();
         let r = self
             .runtime
             .block_on(async { resolver.query((d, Rtype::A, Class::In)).await })
@@ -51,6 +47,25 @@ impl DnsResolver {
             .map(|v| IpAddr::V4(v))
             .inspect(|v| self.log.append(format!("Resolved '{}'.", v).as_str()))
             .collect::<Vec<_>>();
+        all
+    }
+
+
+    pub fn resolve_addresses(&self) {
+        let remote = self.config.remote.lock().unwrap().deref().clone().unwrap();
+
+        let random_start = rng_domain();
+        let remote_with_rng_domain = format!("{}.{}", random_start, remote.0);
+
+
+        let mut all = self.resolve_to_ip_list(remote_with_rng_domain.clone());
+        if all.is_empty() {
+            self.log
+                .append(format!("Unable to resolve any addresses at '{}'.", remote_with_rng_domain.as_str()));
+            self.log.append("Attempting to resolve without any randomized domain...");
+            all = self.resolve_to_ip_list(remote.0);
+        };
+
 
         let mut br = self.config.addresses.lock().unwrap();
         *br = Some(all);
