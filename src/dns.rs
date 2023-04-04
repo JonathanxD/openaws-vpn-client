@@ -4,6 +4,7 @@ use domain::base::iana::Class;
 use domain::base::{Dname, Rtype};
 use domain::rdata::A;
 use rand::prelude::*;
+use regex::Regex;
 use std::net::IpAddr;
 use std::ops::Deref;
 use std::rc::Rc;
@@ -78,3 +79,23 @@ fn rng_domain() -> String {
     rng.fill_bytes(&mut bts);
     hex::encode(bts)
 }
+
+/// parse DNS from openvpn log written to stdout
+pub fn parse_dns(line: String) -> Option<String> {
+    let header = &line.as_bytes()[..32];
+    // expect a header for this line
+    if std::str::from_utf8(header).unwrap() != "PUSH: Received control message: ".to_string() {
+        println!(
+            "no son iguales «{}» & »{}«",
+            std::str::from_utf8(header).unwrap(),
+            "PUSH: Received control message:"
+        );
+        return None;
+    }
+    let dhcp_option_dns_re = Regex::new(r"dhcp-option DNS ([^,]+),").unwrap();
+    for ip in dhcp_option_dns_re.captures_iter(&line) {
+        return Some((&ip[1]).to_string());
+    }
+    None
+}
+
