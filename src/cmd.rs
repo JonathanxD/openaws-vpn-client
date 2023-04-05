@@ -1,3 +1,4 @@
+use crate::dns::parse_dns;
 use crate::saml_server::Saml;
 use crate::{LocalConfig, Log};
 use lazy_static::lazy_static;
