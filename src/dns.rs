@@ -85,11 +85,6 @@ pub fn parse_dns(line: String) -> Option<String> {
     let header = &line.as_bytes()[..32];
     // expect a header for this line
     if std::str::from_utf8(header).unwrap() != "PUSH: Received control message: ".to_string() {
-        println!(
-            "no son iguales «{}» & »{}«",
-            std::str::from_utf8(header).unwrap(),
-            "PUSH: Received control message:"
-        );
         return None;
     }
     let dhcp_option_dns_re = Regex::new(r"dhcp-option DNS ([^,]+),").unwrap();
