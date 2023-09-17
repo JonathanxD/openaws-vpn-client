@@ -22,11 +22,11 @@ Then click on the **Connect** button.
 
 The regular connection flow will start, login into the AWS account. If the authentication succeeds, you will be redirected to a local address that loads the authentication credentials.
 
-After the credentials are loaded, the OpenVPN command will be executed, this requires root privileges, so `pkexec` is used to launch OpenVPN, which will prompt for your root password.
+After the credentials are loaded, the OpenVPN command will be executed. Launching OpenVPN requires root privileges, achieved through `pkexec` on Linux, or `sudo` on Mac. When launching OpenVPN, you will be prompted for your root password.
 
 ### Disconnecting
 
-Clicking on the **Disconnect** button or closing the GUI, will disconnect the VPN, it does require root privileges as well (and `pkexec` is used) to kill the OpenVPN process.
+Clicking on the **Disconnect** button or closing the GUI, will disconnect the VPN, it does require root privileges as well (and either `pkexec` or `sudo` is used) to kill the OpenVPN process.
 
 If the openaws-vpn-client crashes, the VPN connection will not be closed, but in the next time you open the GUI, you will be asked to kill old OpenVPN process.
 

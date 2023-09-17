@@ -13,6 +13,9 @@ use tokio::io::AsyncBufReadExt;
 lazy_static! {
     static ref SHARED_DIR: String = std::env::var("SHARED_DIR").unwrap_or("./share".to_string());
     static ref OPENVPN_FILE: String = std::env::var("OPENVPN_FILE").unwrap_or("./openvpn/bin/openvpn".to_string());
+    static ref OS: String = std::env::consts::OS.to_string();
+    static ref ELEVATION_CMD: String = if OS.as_str() == "macos" { "sudo" } else { "pkexec" }.to_string();
+    static ref PS_COLUMNS: String = if OS.as_str() == "macos" { "command" } else { "cmd" }.to_string();
 }
 
 pub struct ProcessInfo {
@@ -119,7 +122,7 @@ pub async fn connect_ovpn(
 
     let b = std::fs::canonicalize(temp_pwd).unwrap().to_path_buf();
 
-    let mut out = tokio::process::Command::new("pkexec")
+    let mut out = tokio::process::Command::new(ELEVATION_CMD.as_str())
         .arg(OPENVPN_FILE.as_str())
         .arg("--config")
         .arg(config)
@@ -186,7 +189,7 @@ pub fn kill_openvpn(pid: u32) {
 
     let info = Command::new("ps")
         .arg("-o")
-        .arg("cmd")
+        .arg(PS_COLUMNS.as_str())
         .arg("-p")
         .arg(format!("{}", pid))
         .output()
@@ -195,12 +198,15 @@ pub fn kill_openvpn(pid: u32) {
     if let Ok(msg) = String::from_utf8(info.stdout) {
         let last = msg.lines().rev().next();
         if let Some(last) = last {
-            if last.len() > 0 && last.chars().next().map(|v| v == '/').unwrap_or(false) {
+            if last.len() > 0
+                && (OS.as_str() == "macos"
+                    || last.chars().next().map(|v| v == '/').unwrap_or(false))
+            {
                 if last.contains("openvpn --config /")
                     && last.contains("--auth-user-pass /")
                     && last.ends_with("pwd.txt")
                 {
-                    let mut p = Command::new("pkexec")
+                    let mut p = Command::new(ELEVATION_CMD.as_str())
                         .arg("kill")
                         .arg(format!("{}", pid))
                         .spawn()
