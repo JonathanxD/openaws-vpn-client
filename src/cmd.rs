@@ -1,3 +1,4 @@
+use crate::dns::parse_dns;
 use crate::saml_server::Saml;
 use crate::{LocalConfig, Log};
 use lazy_static::lazy_static;
@@ -172,6 +173,11 @@ pub async fn connect_ovpn(
         if let Ok(ref line) = next {
             if let Some(line) = line {
                 log.append_process(pid, line.as_str());
+                tokio::spawn(async move {
+                    // Process each socket concurrently.
+                    parse_dns(line.to_string())
+                        .and_then(|dns_address| _WIP_("Do something with this IP address"))
+                });
             } else {
                 break;
             }
