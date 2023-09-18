@@ -2,7 +2,7 @@ cargo-features = ["strip"]
 
 [package]
 name = "openaws-vpn-client"
-version = "0.1.7"
+version = "0.2.0"
 edition = "2021"
 authors = ["KoresFramework", "Jonathan H. R. Lopes <jhrldev@gmail.com>"]
 license = "MIT"
