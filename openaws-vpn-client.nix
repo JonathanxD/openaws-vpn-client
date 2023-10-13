@@ -5,6 +5,7 @@
 , pkg-config
 , makeRustPlatform
 , rust-bin
+, wrapGAppsHook
 }:
 let
   rustPlatform = makeRustPlatform {
@@ -17,11 +18,12 @@ in rustPlatform.buildRustPackage rec {
 
   buildInputs = [
     pkg-config
-    glib.dev
-    gtk3.dev
+    glib
+    gtk3
   ];
 
   nativeBuildInputs = [
+    wrapGAppsHook
     pkg-config
   ];
 

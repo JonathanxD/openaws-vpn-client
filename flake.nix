@@ -14,7 +14,7 @@
       openaws-vpn-client = let
       pkgs = nixpkgs.legacyPackages.${system}.extend rust-overlay.overlays.default;
         in import ./openaws-vpn-client.nix {
-          inherit (pkgs) rust-bin makeRustPlatform fetchFromGitHub lib pkg-config glib gtk3;
+          inherit (pkgs) rust-bin makeRustPlatform fetchFromGitHub lib pkg-config glib gtk3 wrapGAppsHook;
          };
     };
   };
