@@ -6,6 +6,8 @@
 , makeRustPlatform
 , rust-bin
 , wrapGAppsHook
+, openvpn
+, makeWrapper
 }:
 let
   rustPlatform = makeRustPlatform {
@@ -24,12 +26,18 @@ in rustPlatform.buildRustPackage rec {
 
   nativeBuildInputs = [
     wrapGAppsHook
+    makeWrapper
     pkg-config
   ];
 
   src = ./.;
 
   cargoHash = "sha256-yjhGDiO0pMVw9KFEUbCCF16uPfuusrxBKbFQcHlKYqY=";
+
+  # postInstall = ''
+  #   wrapProgram $out/bin/openaws-vpn-client \
+  #     --set OPENVPN_FILE "${lib.makeBinPath [ openvpn ]}"
+  # '';
 
   meta = with lib; {
     description = "Unofficial open-source AWS VPN client written in Rust";

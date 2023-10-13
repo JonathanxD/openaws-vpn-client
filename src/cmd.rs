@@ -38,9 +38,11 @@ pub struct AwsSaml {
 
 pub async fn run_ovpn(log: Arc<Log>, config: PathBuf, addr: String, port: u16) -> AwsSaml {
     let path = Path::new(SHARED_DIR.as_str()).join(DEFAULT_PWD_FILE);
+    println!("Path :)): {:?} ", path);
     if !path.exists() {
         println!("{:?} does not exist in {:?}!", path, env::current_dir().unwrap());
     }
+    println!("My ovpn file :)): {:?} ", OPENVPN_FILE.as_str());
     let out = tokio::process::Command::new(OPENVPN_FILE.as_str())
         .arg("--config")
         .arg(config)

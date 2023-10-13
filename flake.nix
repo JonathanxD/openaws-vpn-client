@@ -9,12 +9,14 @@
   outputs = { self, nixpkgs, rust-overlay }:
     let system = "x86_64-linux"; in {
 
-    packages.${system} = {
-      default = self.packages.x86_64-linux.openaws-vpn-client;
-      openaws-vpn-client = let
+    packages.${system} = let
       pkgs = nixpkgs.legacyPackages.${system}.extend rust-overlay.overlays.default;
-        in import ./openaws-vpn-client.nix {
-          inherit (pkgs) rust-bin makeRustPlatform fetchFromGitHub lib pkg-config glib gtk3 wrapGAppsHook;
+    in {
+      default = self.packages.${system}.openaws-vpn-client;
+      openvpn = import ./openvpn.nix { inherit (pkgs) fetchpatch openvpn; };
+      openaws-vpn-client = import ./openaws-vpn-client.nix {
+          inherit (self.packages.${system}) openvpn;
+          inherit (pkgs) makeWrapper rust-bin makeRustPlatform fetchFromGitHub lib pkg-config glib gtk3 wrapGAppsHook;
          };
     };
   };
