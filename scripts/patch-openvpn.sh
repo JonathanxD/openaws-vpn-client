@@ -10,6 +10,7 @@
 # - https://smallhacks.wordpress.com/
 # - https://github.com/samm-git/aws-vpn-client
 
+OPENVPN_VERSION="2.5.9"
 CURRENT_DIRNAME=${PWD##*/}
 
 if [ "$CURRENT_DIRNAME" != "scripts" ]; then
@@ -32,12 +33,12 @@ cd tmp
 echo "Downloading OpenVPN..."
 curl https://raw.githubusercontent.com/OpenVPN/openvpn/master/COPYING --output "$ROOT_DIR/../share/openvpn/COPYING"
 curl https://raw.githubusercontent.com/OpenVPN/openvpn/master/COPYRIGHT.GPL --output "$ROOT_DIR/../share/openvpn/COPYRIGHT.GPL"
-curl https://swupdate.openvpn.org/community/releases/openvpn-2.5.5.tar.gz --output openvpn-2.5.5.tar.gz
-echo "a43ad7b1a92fc4fef7d0e64c9ecaad0a40aa76e55bf70385db4ebeee687b9f2ed1ef1e0294bdf73f63a57ab3ba72eb6c4e301a3aad203e2c167b408c5e6c432e  openvpn-2.5.5.tar.gz" | sha512sum -c -
+curl https://swupdate.openvpn.org/community/releases/openvpn-$OPENVPN_VERSION.tar.gz --output openvpn-$OPENVPN_VERSION.tar.gz
+echo "48d04e08ba62aa098d9e3bc246cf521c6e8b200bd817488a05989ae6c42d8fd144ddf03de43eb2f3c4778a643217db4220288c2d40f324076771a20b95d5028b  openvpn-$OPENVPN_VERSION.tar.gz" | sha512sum -c -
 echo "Decompressing OpenVPN..."
-tar -xf openvpn-2.5.5.tar.gz
-rm -rf openvpn-2.5.5.tar.gz
-cd openvpn-2.5.5
+tar -xf openvpn-$OPENVPN_VERSION.tar.gz
+rm -rf openvpn-$OPENVPN_VERSION.tar.gz
+cd openvpn-$OPENVPN_VERSION || exit 1
 
 # Apply OpenVPN patch by 'samm-git'
 echo "Downloading OpenVPN Patch by 'samm-git'..."

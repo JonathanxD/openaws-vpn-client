@@ -1,14 +1,17 @@
 use crate::saml_server::Saml;
 use crate::{LocalConfig, Log};
 use lazy_static::lazy_static;
+use std::env;
 use std::ffi::OsString;
 use std::fs::{remove_file, File};
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex};
 use temp_dir::TempDir;
 use tokio::io::AsyncBufReadExt;
+
+const DEFAULT_PWD_FILE: &str = "./pwd.txt";
 
 lazy_static! {
     static ref SHARED_DIR: String = std::env::var("SHARED_DIR").unwrap_or("./share".to_string());
@@ -34,6 +37,10 @@ pub struct AwsSaml {
 }
 
 pub async fn run_ovpn(log: Arc<Log>, config: PathBuf, addr: String, port: u16) -> AwsSaml {
+    let path = Path::new(SHARED_DIR.as_str()).join(DEFAULT_PWD_FILE);
+    if !path.exists() {
+        println!("{:?} does not exist in {:?}!", path, env::current_dir().unwrap());
+    }
     let out = tokio::process::Command::new(OPENVPN_FILE.as_str())
         .arg("--config")
         .arg(config)
@@ -45,7 +52,7 @@ pub async fn run_ovpn(log: Arc<Log>, config: PathBuf, addr: String, port: u16) -
         .arg(addr)
         .arg(format!("{}", port))
         .arg("--auth-user-pass")
-        .arg("./pwd.txt")
+        .arg(DEFAULT_PWD_FILE)
         .stdout(Stdio::piped())
         .current_dir(SHARED_DIR.as_str())
         .spawn()
