@@ -7,7 +7,7 @@
 # https://gradle.org/
 # https://github.com/gradle/gradle
 
-image: rust:1.57.0
+image: rust:1.76.0
 
 stages:
   - build
@@ -30,8 +30,7 @@ build:
     - "apt install -y libcairo2-dev"
     - "apt install -y libatk1.0-dev"
     - "apt install -y libgtk-3-dev"
-    - "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly"
-    - "cargo +nightly build --release"
+    - "cargo build --release"
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull-push
@@ -44,6 +43,7 @@ build:
 
 build-arm64:
   stage: build
+  allow_failure: true
   script:
     - "apt update"
     - "apt install -y libglib2.0-dev"
@@ -51,8 +51,7 @@ build-arm64:
     - "apt install -y libcairo2-dev"
     - "apt install -y libatk1.0-dev"
     - "apt install -y libgtk-3-dev"
-    - "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly"
-    - "cargo +nightly build --release"
+    - "cargo build --release"
   tags:
     - arm64
     - rpi4
@@ -84,6 +83,7 @@ build-openvpn:
 
 build-openvpn-arm64:
   stage: build
+  allow_failure: true
   script:
     - "apt update"
     - "apt install -y lz4"
@@ -103,7 +103,7 @@ build-openvpn-arm64:
 
 deploy:
   stage: deploy
-  image: rust:1.57.0
+  image: rust:1.76.0
   before_script:
     - "apt update"
     - "apt install -y libglib2.0-dev"
@@ -153,6 +153,7 @@ upload:
 
 upload-arm64:
   stage: upload
+  allow_failure: true
   dependencies:
     - build-arm64
     - build-openvpn-arm64

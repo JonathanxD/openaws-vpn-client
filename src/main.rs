@@ -1,6 +1,3 @@
-#![feature(result_option_inspect)]
-#![feature(async_closure)]
-
 mod app;
 mod cmd;
 mod config;

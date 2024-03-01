@@ -35,10 +35,10 @@ impl SamlServer {
             .and(warp::body::form())
             .and(sender)
             .and(pwd)
-            .and_then(
-                async move |data: HashMap<String, String>,
+            .and_then(move |data: HashMap<String, String>,
                             sender: SyncSender<Saml>,
                             pwd: Arc<Mutex<Option<Pwd>>>| {
+                async move {
                     let pwd = pwd.lock().await;
                     let saml = Saml {
                         data: data["SAMLResponse"].clone(),
@@ -51,8 +51,8 @@ impl SamlServer {
                         "Got SAMLResponse field, it is now safe to close this window",
                         StatusCode::OK,
                     ))
-                },
-            );
+                }
+            });
 
         let handle = runtime.spawn(warp::serve(saml).run(([0, 0, 0, 0], 35001)));
 
