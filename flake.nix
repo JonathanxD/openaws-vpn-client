@@ -17,9 +17,8 @@
         };
 
         toolchain = (pkgs.rustChannelOf {
-          date = "2023-10-11";
-          channel = "nightly";
-          sha256 = "sha256-gq7H6KCWVbf5rp6ceZVomtz/DOxM40i4TeWCIKxNAr8=";
+          channel = "1.76.0";
+          sha256 = "sha256-e4mlaJehWBymYxJGgnbuCObVlqMlQSilZ8FljG9zPHY=";
         }).rust;
 
         naersk' = pkgs.callPackage naersk {
