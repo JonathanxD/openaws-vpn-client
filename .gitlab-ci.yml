@@ -40,12 +40,15 @@ build:
     paths:
       - target/release/openaws-vpn-client
       - LICENSE
+  except:
+    refs:
+      - feat/nix-build-ci-cd
 
 build-flake:
   image: nixos/nix:latest
   stage: build
   script:
-    - "echo 'experimental-features = nix-command flakes' > ~/.config/nix/nix.conf"
+    - "echo 'experimental-features = nix-command flakes' > /etc/nix/nix.conf"
     - "nix build"
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -76,6 +79,9 @@ build-arm64:
     paths:
       - target/release/openaws-vpn-client
       - LICENSE
+  only:
+    refs:
+      - master
 
 build-openvpn:
   stage: build
@@ -92,6 +98,9 @@ build-openvpn:
   artifacts:
     paths:
       - share.tar.gz
+  except:
+    refs:
+      - feat/nix-build-ci-cd
 
 build-openvpn-arm64:
   stage: build
@@ -112,6 +121,9 @@ build-openvpn-arm64:
   artifacts:
     paths:
       - share-arm64.tar.gz
+  only:
+    refs:
+      - master
 
 deploy:
   stage: deploy
