@@ -59,6 +59,7 @@ build-flake:
     changes:
       - flake.nix
       - flake.lock
+      - .gitlab-ci.yml
   tags:
     - saas-linux-medium-amd64
 
