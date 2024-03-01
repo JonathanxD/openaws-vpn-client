@@ -41,6 +41,18 @@ build:
       - target/release/openaws-vpn-client
       - LICENSE
 
+build-flake:
+  image: nixos/nix:latest
+  stage: build
+  script:
+    - "echo 'experimental-features = nix-command flakes' > ~/.config/nix/nix.conf"
+    - "nix build"
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull-push
+    paths:
+      - /nix
+
 build-arm64:
   stage: build
   allow_failure: true
