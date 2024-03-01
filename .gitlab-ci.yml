@@ -1,12 +1,3 @@
-# To contribute improvements to CI/CD templates, please follow the Development guide at:
-# https://docs.gitlab.com/ee/development/cicd/templates.html
-# This specific template is located at:
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Gradle.gitlab-ci.yml
-
-# This is the Gradle build system for JVM applications
-# https://gradle.org/
-# https://github.com/gradle/gradle
-
 image: rust:1.76.0
 
 stages:
@@ -14,10 +5,6 @@ stages:
   - deploy
   - upload
 
-# Disable the Gradle daemon for Continuous Integration servers as correctness
-# is usually a priority over speed in CI environments. Using a fresh
-# runtime for each build is more reliable since the runtime is completely
-# isolated from any previous builds.
 variables:
   CACHE_FALLBACK_KEY: "master"
 
@@ -40,9 +27,6 @@ build:
     paths:
       - target/release/openaws-vpn-client
       - LICENSE
-  except:
-    refs:
-      - feat/nix-build-ci-cd
 
 build-flake:
   image: nixos/nix:latest
@@ -50,16 +34,6 @@ build-flake:
   script:
     - "echo 'experimental-features = nix-command flakes' > /etc/nix/nix.conf"
     - "nix build"
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull-push
-    paths:
-      - /nix
-  only:
-    changes:
-      - flake.nix
-      - flake.lock
-      - .gitlab-ci.yml
   tags:
     - saas-linux-medium-amd64
 
@@ -105,9 +79,6 @@ build-openvpn:
   artifacts:
     paths:
       - share.tar.gz
-  except:
-    refs:
-      - feat/nix-build-ci-cd
 
 build-openvpn-arm64:
   stage: build
