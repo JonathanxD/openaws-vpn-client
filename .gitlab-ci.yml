@@ -55,6 +55,12 @@ build-flake:
     policy: pull-push
     paths:
       - /nix
+  only:
+    changes:
+      - flake.nix
+      - flake.lock
+  tags:
+    - saas-linux-medium-amd64
 
 build-arm64:
   stage: build
