@@ -31,6 +31,10 @@
           src = ./.;
           buildInputs = [ pkg-config glib gtk3 ];
           nativeBuildInputs = [ pkg-config wrapGAppsHook makeWrapper ];
+
+          postInstall = ''
+            ln -s ${openvpn-patched}/bin/openvpn $out/bin/openvpn-patched
+          '';
         };
 
         overlays.default = final: prev: {
