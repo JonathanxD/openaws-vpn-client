@@ -33,7 +33,10 @@
           nativeBuildInputs = [ pkg-config wrapGAppsHook makeWrapper ];
 
           postInstall = ''
-            ln -s ${openvpn-patched}/bin/openvpn $out/bin/openvpn-patched
+            cp -r $src/share $out/share
+            wrapProgram "$out/bin/openaws-vpn-client" \
+              --set-default OPENVPN_FILE "${openvpn-patched}/bin/openvpn" \
+              --set-default SHARED_DIR "$out/share"
           '';
         };
 
