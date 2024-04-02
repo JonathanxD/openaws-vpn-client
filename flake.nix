@@ -29,7 +29,7 @@
       in with pkgs; rec {
         defaultPackage = naersk'.buildPackage {
           src = ./.;
-          buildInputs = [ pkg-config glib gtk3 ];
+          buildInputs = [ pkg-config glib gtk3 xdg-utils ];
           nativeBuildInputs = [ pkg-config wrapGAppsHook makeWrapper ];
 
           postInstall = ''
