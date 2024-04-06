@@ -39,7 +39,7 @@ build-flake:
 
 build-arm64:
   stage: build
-  allow_failure: true
+  when: manual
   script:
     - "apt update"
     - "apt install -y libglib2.0-dev"
@@ -81,7 +81,7 @@ build-openvpn:
 
 build-openvpn-arm64:
   stage: build
-  allow_failure: true
+  when: manual
   script:
     - "apt update"
     - "apt install -y lz4"
@@ -153,7 +153,7 @@ upload:
 
 upload-arm64:
   stage: upload
-  allow_failure: true
+  when: manual
   dependencies:
     - build-arm64
     - build-openvpn-arm64
