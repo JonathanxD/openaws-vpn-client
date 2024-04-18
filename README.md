@@ -48,7 +48,7 @@ A build script is provided in `scripts/patch-openvpn.sh`, this script downloads 
 
 ### Running the compiled artifact
 
-After building the project (`cargo build --release`) make sure to copy the `share` folder to be in the same directory as `openaws-vpn-client` (the built artifact), otherwise you'll get an error like `Handling... Disconnected` whenever you try to connect to a VPN.
+After building the project (with `cargo build --release`), and the custom `OpenVPN` client, make sure to copy the `share` folder to be in the same directory as `openaws-vpn-client` (the built artifact), otherwise you'll get an error like `Handling... Disconnected` whenever you try to connect to a VPN.
 
 #### Requirements
 
