@@ -46,9 +46,9 @@ AWS VPN needs a custom `openvpn` client, happily (because of OpenVPN GPL License
 
 A build script is provided in `scripts/patch-openvpn.sh`, this script downloads OpenVPN source code from official OpenVPN website and the patch files from [Alex Samorukov GitHub](https://github.com/samm-git/aws-vpn-client), then it applies the patches and builds the client, copying licenses and binaries into `share/openvpn`.
 
-### Building openaws-vpn-client
+### Running the compiled artifact
 
-A nightly rust toolchain is required to build openaws-vpn-client, you can use `rustup` to install it, then run `cargo +nightly build`.
+After building the project (with `cargo build --release`), and the custom `OpenVPN` client, make sure to copy the `share` folder to be in the same directory as `openaws-vpn-client` (the built artifact), otherwise you'll get an error like `Handling... Disconnected` whenever you try to connect to a VPN.
 
 #### Requirements
 
