@@ -36,7 +36,7 @@ I'll be working on a better solution soon.
 
 ## Installation
 
-Currently, we do not have installation scripts, but you can easily download artifacts from [GitLab](https://gitlab.com/Kores/openaws-vpn-client/-/packages).
+Currently, we do not have installation scripts, but you can easily download artifacts from [GitLab](https://gitlab.com/Kores/openaws-vpn-client/-/packages?orderBy=created_at&sort=desc).
 
 ## Building
 
@@ -68,7 +68,7 @@ Amazon already provides an official VPN Client for Linux, the problem is:
 
 I'm using Arch Linux, I tried AUR version of official client, the recent version wasn't working, so I download an older one, it opened but didn't work, wasn't able to connect to the VPN with a generic error.
 
-So I looked for hours for a solution, and ended up finding an alternative client developed by [samm-git/aws-vpn-client](https://github.com/samm-git/aws-vpn-client) in bash, based on a reverse engineering study posted in [their blog](https://smallhacks.wordpress.com/2020/07/08/aws-client-vpn-internals/) from 2020. 
+So I looked for hours for a solution, and ended up finding an alternative client developed by [samm-git/aws-vpn-client](https://github.com/samm-git/aws-vpn-client) in bash, based on a reverse engineering study posted in [their blog](https://smallhacks.wordpress.com/2020/07/08/aws-client-vpn-internals/) from 2020.
 This script wasn't working, but it got more far than the official client on Arch, and was open-source and easy to debug, tweak and test, after a couple of hours, I was able to get the script working, so I decided to create a user-friendly open-source GUI based on the study and the original script.
 
 So, thanks [samm-git](https://github.com/samm-git/aws-vpn-client) for taking their time to study and write a wrapper, that solved my problem.
